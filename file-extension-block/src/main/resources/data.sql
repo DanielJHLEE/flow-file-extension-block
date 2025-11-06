@@ -1,7 +1,7 @@
 -- =====================================================
 -- 초기화: 기존 데이터 삭제 후 재삽입
 -- =====================================================
-DELETE FROM ext_policy;
+DELETE FROM ext_file_policy;
 
 -- =====================================================
 -- 🔹 1. 고정 확장자 (FIXED)
@@ -10,7 +10,7 @@ DELETE FROM ext_policy;
 -- → px_status = 'Y' (Check)
 -- → is_active = 0 (차단 대기 상태)
 -- =====================================================
-INSERT INTO ext_policy (name, type, px_status, cs_add_status, is_active, created_ip, note)
+INSERT INTO ext_file_policy (name, type, px_status, cs_add_status, is_active, created_ip, note)
 VALUES
 ('bat', 'FIXED', 'N', 'N', 0, 'SYSTEM', null),
 ('cmd', 'FIXED', 'N', 'N', 0, 'SYSTEM', null),
@@ -27,7 +27,7 @@ VALUES
 -- → cs_add_status = 'Y' (커스텀 확장자 추가됨)
 -- → is_active = 0 (차단 대기 상태)
 -- =====================================================
-INSERT INTO ext_policy (name, type, px_status, cs_add_status, is_active, created_ip, note)
+INSERT INTO ext_file_policy (name, type, px_status, cs_add_status, is_active, created_ip, note)
 VALUES
 ('sh', 'CUSTOM', 'N', 'Y', 0, '192.168.0.15', null),
 ('ju', 'CUSTOM', 'N', 'Y', 0, '192.168.0.15', null),
