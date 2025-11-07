@@ -3,12 +3,11 @@
 
 📘 **프로젝트 개요**
 
-Spring Boot 기반의 파일 확장자 차단 관리 시스템입니다.
-고정 확장자(FIXED)와 커스텀 확장자(CUSTOM)를 구분하여 관리하며,
+Spring Boot 기반의 파일 확장자 차단 관리 시스템입니다.  
+고정 확장자(FIXED)와 커스텀 확장자(CUSTOM)를 구분하여 관리하며,  
 커스텀 확장자는 사용자 IP 기반으로 등록 이력을 SHA-256 해시 암호화하여 저장합니다.
 
-⚙️ **주요 기능**  
- **구분**    
+⚙️ **주요 기능**    
 🔹 고정 확장자 관리	사전에 정의된 확장자에 대한 차단 여부 설정 (체크박스)  
 🔹 커스텀 확장자 관리	사용자가 직접 확장자 추가·삭제 (최대 200개)  
 🔹 IP 해시 기록	커스텀 확장자 등록 시 IP 암호화 저장 (SYSTEM 예외 처리)  
@@ -23,15 +22,27 @@ Spring Boot 기반의 파일 확장자 차단 관리 시스템입니다.
 ## 요구사항(Prerequisites)
 - JDK 21
 - MySQL (또는 JDBC 지원하는 DB)
-- Windows: PowerShell 사용 권장 (레포지토리에 포함된 gradlew.bat 사용 가능)
+- Windows: PowerShell, bash 사용 권장 (레포지토리에 포함된 gradlew.bat 사용 가능)
 
-🧠 상태값 정의
-구분	px_status / cs_add_status	is_active	의미
-대기	Y	0	체크됨 (대기중)
-활성	Y	1	실제 차단 적용
-비활성	N	2	체크 해제
+**🧠 상태값 정의(확장자 차단 로직)**
+구분	**px_status** / **cs_add_status**  /**is_active**
 
-📡 API 명세
+1. px_status=**Y**&is_active=**0** 체크됨 :  **대기**	
+2. px_status=**Y**&is_active=**0**	체크됨 :  **대기**
+
+4. px_status=**Y**&is_active=**1** 체크됨 : **활성화(차단활성화)**
+5. cs_add_status=**Y**&is_active=**1** 체크됨 : **활성화(차단활성화)**
+6. cs_add_status=**Y**&is_active=**1** 체크됨 : **활성화(차단활성화)**
+
+7. px_status=**N**&is_active=**0** 언체크 : **대기**
+8. cs_add_status=**N**&is_active=**0** 언체크 : **대기**
+9.  
+활성	Y	1	(실제 차단 적용)
+
+비활성	N	2	비활성화
+
+
+**📡 API 명세**
 Method	Endpoint	설명
 GET	/api/ext-files	전체 확장자 목록 조회
 GET	/api/ext-files/fixed	고정 확장자 목록 조회
