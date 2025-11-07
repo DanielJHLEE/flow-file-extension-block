@@ -1,15 +1,18 @@
 # Flow File Extension Block
 
-간단하고 깔끔한 설명서입니다. 이 저장소는 파일 확장자 차단(File Extension Block) 기능을 구현한 Spring Boot 애플리케이션을 포함합니다.
+📄 파일 확장자 차단 시스템 (File Extension Block System)
+📘 프로젝트 개요
 
-## 한줄 요약
-특정 파일 확장자의 업로드/전송을 차단하도록 구성된 Spring Boot 기반 백엔드 예제 프로젝트입니다. 고정(FIXED) 확장자와 커스텀(CUSTOM) 확장자를 구분해 관리합니다.
+Spring Boot 기반의 파일 확장자 차단 관리 시스템입니다.
+고정 확장자(FIXED)와 커스텀 확장자(CUSTOM)를 구분하여 관리하며,
+커스텀 확장자는 사용자 IP 기반으로 등록 이력을 해시 암호화하여 저장합니다.
 
-## 주요 기능
-- 확장자 화이트/블랙리스트 관리
-- 고정(FIXED) 확장자와 커스텀(CUSTOM) 확장자 구분
-- 커스텀 확장자 등록 시 IP 기반 이력 관리
-- Thymeleaf 템플릿을 이용한 간단한 UI (extension_list)
+⚙️ 주요 기능
+구분	설명
+🔹 고정 확장자 관리	사전에 정의된 확장자에 대한 차단 여부 설정 (체크박스)
+🔹 커스텀 확장자 관리	사용자가 직접 확장자 추가·삭제 (최대 200개)
+🔹 IP 해시 기록	커스텀 확장자 등록 시 IP 암호화 저장 (SYSTEM 예외 처리)
+🔹 상태 복원	새로고침(F5) 후에도 DB 상태 기반으로 UI 상태 자동 반영
 
 ## 기술 스택
 - Java 21 (toolchain 설정)
@@ -23,26 +26,39 @@
 - MySQL (또는 JDBC 지원하는 DB)
 - Windows: PowerShell 사용 권장 (레포지토리에 포함된 gradlew.bat 사용 가능)
 
-## 빠른 시작(Windows / PowerShell)
-1. 프로젝트 루트로 이동:
+🧠 상태값 정의
+구분	px_status / cs_add_status	is_active	의미
+대기	Y	0	체크됨 (대기중)
+활성	Y	1	실제 차단 적용
+비활성	N	2	체크 해제
 
-```powershell
-cd .\file-extension-block
-```
+📡 API 명세
+Method	Endpoint	설명
+GET	/api/ext-files	전체 확장자 목록 조회
+GET	/api/ext-files/fixed	고정 확장자 목록 조회
+GET	/api/ext-files/custom	커스텀 확장자 목록 조회
+PUT	/api/ext-files/{id}/status	고정 확장자 상태 변경
+POST	/api/ext-files/custom	커스텀 확장자 추가
+PATCH	/api/ext-files/custom/{id}	커스텀 확장자 비활성화
+DELETE	/api/ext-files/custom/{id}	커스텀 확장자 완전 삭제
 
-2. 애플리케이션 실행(개발용):
+🧩 빠른 시작 (Bash / macOS / Linux)
 
-```powershell
-.\gradlew.bat bootRun
-```
+1️⃣ 프로젝트 루트로 이동
 
-3. 또는 빌드 후 실행:
+cd ./file-extension-block
 
-```powershell
-.\gradlew.bat clean build
-# 생성된 jar 위치: build\libs\<프로젝트>-<버전>.jar
-java -jar build\libs\file-extension-block-0.0.1-SNAPSHOT.jar
-```
+
+2️⃣ 애플리케이션 실행 (개발용)
+
+./gradlew bootRun
+
+
+3️⃣ 또는 빌드 후 실행
+
+./gradlew clean build
+# 생성된 jar 위치: build/libs/<프로젝트>-<버전>.jar
+java -jar build/libs/file-extension-block-0.0.1-SNAPSHOT.jar
 
 환경변수(선택)
 - DB 사용자명: DB_USERNAME (기본값: root)
@@ -75,22 +91,5 @@ $env:DB_USERNAME = 'root'; $env:DB_PASSWORD = '9181'; .\gradlew.bat bootRun
 - `file-extension-block/src/main/resources/static/` - 정적 자원 (css/js)
 - `file-extension-block/src/main/resources/templates/extension/` - Thymeleaf 템플릿 (extension_list.html)
 
-## 테스트
-테스트 실행:
 
-```powershell
-.\gradlew.bat test
-```
-
-## 참고 및 개발 메모
-- `file-extension-block/HELP.md`에는 패키지명 관련 안내(원래 패키지명과 실제 사용 패키지명 차이)가 포함되어 있습니다.
-- `application.yaml`에 샘플로 포함된 `security.disallowed-extensions` 항목을 참고하여 차단 정책을 조정하세요.
-
-## 다음 단계 / 제안
-- 로컬 DB 대신 Docker로 MySQL을 띄워 개발 환경을 일관화
-- 프론트엔드와 연동 테스트 (파일 업로드 시 확장자 차단 확인)
-
----
-
-필요하시면 README에 추가할 운영 배포 가이드(도커, CI 설정, 환경 별 프로파일)도 작성해 드리겠습니다.
 
