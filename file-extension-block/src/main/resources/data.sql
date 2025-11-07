@@ -19,16 +19,3 @@ VALUES
 ('exe', 'FIXED', 'N', 'N', 0, 'SYSTEM', null),
 ('scr', 'FIXED', 'N', 'N', 0, 'SYSTEM', null),
 ('js',  'FIXED', 'N', 'N', 0, 'SYSTEM', null);
-
--- =====================================================
--- 🔹 2. 커스텀 확장자 (CUSTOM)
--- 사용자 추가 확장자 — 등록만 되어 있고 아직 차단되지 않음
--- → cs_add_status = 'N' (커스텀 확장자 삭제됨)
--- → cs_add_status = 'Y' (커스텀 확장자 추가됨)
--- → is_active = 0 (차단 대기 상태)
--- =====================================================
-INSERT INTO ext_file_policy (name, type, px_status, cs_add_status, is_active, created_ip, note)
-VALUES
-('sh', 'CUSTOM', 'N', 'Y', 0, '192.168.0.15', null),
-('ju', 'CUSTOM', 'N', 'Y', 0, '192.168.0.15', null),
-('ch', 'CUSTOM', 'N', 'Y', 0, '192.168.0.15', null);

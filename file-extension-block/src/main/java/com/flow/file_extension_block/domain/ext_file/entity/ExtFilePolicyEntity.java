@@ -2,6 +2,8 @@ package com.flow.file_extension_block.domain.ext_file.entity;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.DynamicUpdate;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -24,6 +26,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@DynamicUpdate
 public class ExtFilePolicyEntity {
 
     @Id
@@ -37,10 +40,17 @@ public class ExtFilePolicyEntity {
     @Enumerated(EnumType.STRING)
     private Type type; // FIXED / CUSTOM
 
-    private char pxStatus; // 고정 확장자 체크 상태 (Y/N)
-    private char csAddStatus; // 커스텀 확장자 추가/삭제 (Y/N)
-    private int isActive; // 0=대기,1=활성,2=비활성
+    @Column(name = "px_status", columnDefinition = "CHAR(1)")
+    private Character pxStatus; // 고정 확장자 체크 상태 (Y/N)
+
+    @Column(name = "cs_add_status", columnDefinition = "CHAR(1)")
+    private Character csAddStatus; // 커스텀 확장자 추가/삭제 (Y/N)
+
+    @Column(name = "is_active", columnDefinition = "CHAR(1)")
+    private Character isActive; //  0=대기,1=활성,2=비활성
+
     private String createdIp;
+
     private String note;
 
     @Column(columnDefinition = "timestamp default current_timestamp")

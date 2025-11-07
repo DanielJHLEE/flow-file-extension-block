@@ -50,6 +50,9 @@ public class ExtFilePolicyDto {
     @NoArgsConstructor
     @Builder
     public static class ExtFilePolicyRequestDto {
+
+        private Long id;
+        
         @NotBlank(message = "확장자명은 필수입니다.")
         @Size(max = 20, message = "확장자명은 최대 20자까지 입력 가능합니다.")
         @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "확장자명은 영문과 숫자만 허용됩니다.")
@@ -61,5 +64,6 @@ public class ExtFilePolicyDto {
 
         private Character csAddStatus; // 'Y' or 'N'
         private Integer isActive;      // 0, 1, 2
+        private String type;
     }
 }

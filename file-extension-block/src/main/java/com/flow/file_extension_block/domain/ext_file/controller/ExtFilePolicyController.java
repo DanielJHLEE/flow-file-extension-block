@@ -2,6 +2,7 @@ package com.flow.file_extension_block.domain.ext_file.controller;
 
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.flow.file_extension_block.domain.ext_file.dto.ExtFilePolicyDto;
@@ -71,6 +72,18 @@ public class ExtFilePolicyController {
     }
 
     /**
+     * 고정 확장자 차단 확정 (Y/1, N/2)
+     * - 실제 차단 적용 시 사용
+     */
+    @PostMapping("/apply")
+    public ResponseEntity<String> applyAllExtensions(
+            @RequestBody List<ExtFilePolicyDto.ExtFilePolicyRequestDto> updates
+    ) {
+        extensionService.applyAllExtensions(updates);
+        return ResponseEntity.ok("전체 저장 완료");
+    }
+
+    /**
      * 커스텀 확장자 추가
      * POST /api/ext-files/custom
      * - ip는 프론트에서 fetch 시 클라이언트IP나 더미로 전달 가능
@@ -109,5 +122,15 @@ public class ExtFilePolicyController {
             @RequestParam char csAddStatus
     ) {
         extensionService.deleteCustomExtension(id, type, isActive, csAddStatus);
+    }
+
+    /**
+     * 커스텀 확장자 완전 삭제
+     * DELETE /api/ext-files/custom/{id}
+     * - DB에서 완전 삭제
+     */
+    @DeleteMapping("/custom/{id}")
+    public void deleteCustomExtension(@PathVariable Long id) {
+        extensionService.deleteCustomExtension(id);
     }
 }
