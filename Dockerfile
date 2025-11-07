@@ -10,3 +10,6 @@ ENTRYPOINT ["java", "-jar", "/app.jar"]
 
 # 4️⃣ 포트 오픈 (Spring Boot 기본 8080)
 EXPOSE 8080
+
+# 5️⃣ 환경 변수 설정 (필요 시)
+ENV SPRING_PROFILES_ACTIVE=render
