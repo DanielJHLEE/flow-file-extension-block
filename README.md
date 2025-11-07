@@ -19,10 +19,10 @@ Spring Boot 기반의 파일 확장자 차단 관리 시스템입니다.
 - Thymeleaf
 - Gradle
 
-## 요구사항(Prerequisites)
-- JDK 21
-- MySQL (또는 JDBC 지원하는 DB)
-- Windows: PowerShell, bash 사용 권장 (레포지토리에 포함된 gradlew.bat 사용 가능)
+## 요구사항(Prerequisites)  
+- JDK 21  
+- MySQL (또는 JDBC 지원하는 DB)  
+- Windows: PowerShell, bash 사용 권장 (레포지토리에 포함된 gradlew.bat 사용 가능)  
 
 **☁️ 실제 배포 환경 (Production Environment)**
 항목	내용
