@@ -5,14 +5,14 @@ import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.flow.file_extension_block.domain.ext_file.dto.ExtFilePolicyDto;
 import com.flow.file_extension_block.domain.ext_file.entity.ExtFilePolicyEntity;
 import com.flow.file_extension_block.domain.ext_file.repository.ExtFilePolicyRepository;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -72,7 +72,10 @@ public class ExtFilePolicyService {
      * 고정 확장자 상태 변경 (체크 / 언체크)
      * px_status : 'Y' or 'N'
      * is_active : 0(대기중), 1(활성화), 2(비활성화)
-     * type : FIXED or CUSTOM (선택적)
+     * Y/0 : 체크됨(대기중)
+     * Y/1 : 체크됨(활성화)
+     * N/0 : 체크해제(대기중)
+     * N/2 : 체크해제(비활성화)
      */
     @Transactional
     public void updateFixedStatus(Long id, char pxStatus, Integer isActive) {
@@ -88,20 +91,20 @@ public class ExtFilePolicyService {
         if (pxStatus == 'Y') {
             // 체크 상태
             if (isActive != null && isActive == 1) {
-                // 전송됨 → 활성화(실제 차단하라는 데이터)
-                extFile.setIsActive(1);
+                // 활성화(실제 차단하라는 데이터)
+                extFile.setIsActive('1');
             } else {
                 // 단순 체크만 → 대기중
-                extFile.setIsActive(0);
+                extFile.setIsActive('0');
             }
         } else if (pxStatus == 'N') {
             // 체크 해제 상태 -> 비활성화
             if (isActive != null && isActive == 2) {
                 // 전송됨 → 비활성화
-                extFile.setIsActive(2);
+                extFile.setIsActive('2');
             } else {
                 // 단순 해제만 → 대기중
-                extFile.setIsActive(0);
+                extFile.setIsActive('0');
             }
         }
 
@@ -137,7 +140,7 @@ public class ExtFilePolicyService {
         policy.setName(name);
         policy.setType(ExtFilePolicyEntity.Type.CUSTOM);
         policy.setCsAddStatus('Y');
-        policy.setIsActive(0); // 대기중
+        policy.setIsActive('0'); // 대기중
         // IP 해시 적용
         String hashedIp = hashIp(ip);
         policy.setCreatedIp(hashedIp);
@@ -145,9 +148,9 @@ public class ExtFilePolicyService {
          // isActive 처리
          // 'Y'인 경우 1 또는 0, 'N'인 경우 2 또는 0 설정
         if (csAddStatus == 'Y') {
-            policy.setIsActive(isActive != null && isActive == 1 ? 1 : 0);
+            policy.setIsActive(isActive != null && isActive == '1' ? '1' : '0');
         } else if (csAddStatus == 'N') {
-            policy.setIsActive(isActive != null && isActive == 2 ? 2 : 0);
+            policy.setIsActive(isActive != null && isActive == '2' ? '2' : '0');
         }
 
         policy.setPxStatus('N'); // 기본값 'N'
@@ -159,6 +162,39 @@ public class ExtFilePolicyService {
                 name, hashedIp.substring(0, 12) + "...", csAddStatus, policy.getIsActive(), policy.getUpdateDate());
 
         return extensionRepository.save(policy);
+    }
+
+    /**
+     * 전체 확장자 일괄 적용
+     * - 고정 확장자 및 커스텀 확장자 모두 적용
+     * - px_status='Y' or cs_add_status='Y'인 항목을 대상으로 is_active=1로 변경
+     * - 나머지는 is_active=0으로 변경
+     * - 프론트에서 전달된 리스트를 순회하며 처리
+     * ex) [{id:1, type:'FIXED'}, {id:2, type:'CUSTOM'}, ...]
+     */
+    @Transactional
+    public void applyAllExtensions(List<ExtFilePolicyDto.ExtFilePolicyRequestDto> updates) {
+        for (ExtFilePolicyDto.ExtFilePolicyRequestDto dto : updates) {
+            log.info("🚨 dto debug → id={}, type={}, csAddStatus={}, isActive={}",
+                    dto.getId(), dto.getType(), dto.getCsAddStatus(), dto.getIsActive());
+            ExtFilePolicyEntity entity = extensionRepository.findById(dto.getId())
+                    .orElseThrow(() -> new IllegalArgumentException("해당 확장자를 찾을 수 없습니다. id=" + dto.getId()));
+
+             if ("FIXED".equalsIgnoreCase(dto.getType())) {
+                entity.setPxStatus('Y');
+                entity.setIsActive('1');
+            } else if ("CUSTOM".equalsIgnoreCase(dto.getType())) {
+                entity.setCsAddStatus('Y');
+                entity.setIsActive('1');
+            }
+
+            entity.setUpdateDate(LocalDateTime.now());
+
+              log.info("✅ UPDATE TRY → id={}, type={}, csAddStatus={}, isActive={}",
+                    entity.getId(), entity.getType(), entity.getCsAddStatus(), entity.getIsActive());
+
+            extensionRepository.save(entity);
+        }
     }
 
     /**
@@ -185,9 +221,9 @@ public class ExtFilePolicyService {
          // isActive 처리
          // 'Y'인 경우 1 또는 0, 'N'인 경우 2 또는 0 설정
         if (csAddStatus == 'Y') {
-            extFile.setIsActive(isActive != null && isActive == 1 ? 1 : 0);
+            extFile.setIsActive(isActive != null && isActive == '1' ? '1' : '0');
         } else if (csAddStatus == 'N') {
-            extFile.setIsActive(isActive != null && isActive == 2 ? 2 : 0);
+            extFile.setIsActive(isActive != null && isActive == '2' ? '2' : '0');
         }
 
         // 수정일 설정
@@ -197,5 +233,16 @@ public class ExtFilePolicyService {
 
         log.info("[INFO] Custom extension status updated → id={}, type={}, csAddStatus={}, updateDate={}",
                 id, type, csAddStatus, extFile.getUpdateDate());
+    }
+
+    /**
+     * 커스텀 확장자 완전 삭제
+     * - DB에서 완전 삭제
+     */
+    @Transactional
+    public void deleteCustomExtension(Long id) {
+        ExtFilePolicyEntity entity = extensionRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 확장자가 존재하지 않습니다."));
+        extensionRepository.delete(entity);
     }
 }
