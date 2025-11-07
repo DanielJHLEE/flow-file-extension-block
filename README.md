@@ -24,6 +24,30 @@ Spring Boot 기반의 파일 확장자 차단 관리 시스템입니다.
 - MySQL (또는 JDBC 지원하는 DB)
 - Windows: PowerShell, bash 사용 권장 (레포지토리에 포함된 gradlew.bat 사용 가능)
 
+**☁️ 실제 배포 환경 (Production Environment)**
+항목	내용
+- 플랫폼	Render: (무료 Web Service 플랜)
+- 배포 URL:	🔗 https://flow-file-extension-block.onrender.com
+- 서버 포트	8080 (Spring Boot 기본 포트)
+- 런타임 환경	Java 21 (Eclipse Temurin JDK, Gradle Toolchain 사용)
+- 프레임워크	Spring Boot 3.4.11
+- 빌드 방식	Gradle 빌드 후 JAR 실행 (java -jar build/libs/file-extension-block-0.0.1-SNAPSHOT.jar)
+- DB 환경	H2 In-Memory DB (jdbc:h2:mem:testdb)
+- JPA 설정
+	- spring.jpa.hibernate.ddl-auto=update
+	- spring.sql.init.mode=always
+- 배포 프로세스	GitHub → Render Auto Deploy (main 브랜치 push 시 자동 빌드/배포)
+- 서버 초기화 시 로직
+- H2 테이블 자동 생성
+- 기본 확장자 정책(FIXED) 자동 등록
+- index.html 정적 페이지 렌더링
+- 로그 레벨  org.hibernate.SQL=debug / org.hibernate.type.descriptor.sql=trace
+- 보안 고려
+	- 위험 확장자 리스트 YAML에서 관리
+	- 사용자 IP SHA-256 해시 처리 저장
+
+-----------------------------------------------------------------------------------------------------
+
 **🧠 상태값 정의(확장자 차단 로직)**
 구분	**px_status** / **cs_add_status**  /**is_active**
 
@@ -101,7 +125,7 @@ $env:DB_PASSWORD = '9181';
 
 **🧩 개발 시 고려사항 및 문제해결 과정**
 
-**(느낀점)**
+**(느낀점)**  
 처음에는 간단한 UI입력 창 통신 주고받으면서 그리면 되겠구나라고 생각했지만
 생각보다 고려해야할 사항이나 점검해야할 부분들이 많아서 생각을 많이 하게 되었던 과제이자
 짧은 프로젝트였던 것 같습니다.
@@ -126,6 +150,40 @@ H2(in-memory DB) 사용 시 매번 데이터가 초기화되는 문제를 고려
 문제 상황 예시
 sh를 추가한 뒤 다시 sh 추가 시 → 예외 발생
 대소문자 구분을 방지하기 위해 .equalsIgnoreCase() 또는 DB unique constraint 활용
+
+**3. 보안 고려 – IP 저장 방식**
+커스텀 확장자 등록 시, 사용자의 IP를 평문으로 저장하는 것은 위험하다고 판단.
+SHA-256 해시 알고리즘을 적용해 IP를 해시 형태로 저장하도록 구현.
+이를 통해 개인정보 노출을 방지하고, 로그에는 해시의 일부만 표시하도록 처리 (substring(0,12)).
+
+**4. 커스텀 확장자 상태 관리 로직 정립**
+과제 요구사항에 따라 px_status(차단 여부)와 is_active(활성 상태)의 조합으로 상태를 표현해야 함.
+이를 명확히 구분하기 위해 아래와 같이 매핑 정의:  
+
+**5. px_status	is_active	의미**
+Y	0	체크만 된 대기중
+Y	1	체크 + 실제 차단 적용
+N	0	해제된 대기중
+N	2	체크 해제 + 비활성화
+이 로직을 updateFixedStatus() 내부에 명시적으로 분기 처리하여 안정성 확보.
+
+**6. 커스텀 확장자 최대 200개 제한**
+무분별한 추가를 방지하기 위해 DB 쿼리(countByType)로 현재 등록된 커스텀 개수를 조회하고,
+200개 이상 시 globalExceptionHandler로 응답처리 하도록 설정.
+
+**7. 서버 배포 환경(Render)에서의 Cold Start / H2 초기화 문제**
+Render 무료 플랜의 cold start latency 문제로, 서버 재시작 시 첫 API 호출이 실패하는 현상 발생.
+이를 해결하기 위해 application-render.yml에서
+
+spring.jpa.hibernate.ddl-auto=update
+
+spring.sql.init.mode=always
+설정을 명시하여 재시작 시 DB 구조 및 초기 데이터가 자동 보존되도록 처리.
+
+첫 API 호출 시 대기 시간을 고려하여 클라이언트가 재시도할 수 있도록 설계.
+
+
+
 
 
 
