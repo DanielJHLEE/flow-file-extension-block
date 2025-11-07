@@ -80,7 +80,7 @@ $env:DB_USERNAME = 'root'; $env:DB_PASSWORD = '9181'; .\gradlew.bat bootRun
 ## 프로젝트 구조 (핵심 경로)
 - `file-extension-block/src/main/java/com/flow/file_extension_block/`
 	- `domain/ext_file/`
-		- `controller/` - 요청을 처리하는 컨트롤러
+		- `controller/` - 요청을 처리하는 컨트롤러xx
 		- `dto/` - 데이터 전송 객체
 		- `entity/` - JPA 엔티티
 		- `repository/` - Spring Data JPA 리포지토리

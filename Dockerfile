@@ -1,5 +1,5 @@
 # 1️⃣ JDK 21 기반 slim 이미지 사용
-FROM openjdk:21-jdk-slim
+FROM openjdk:21-jdk-slims
 
 # 2️⃣ JAR 파일 복사 (이름 정확히 맞춰야 함)
 ARG JAR_FILE=build/libs/file-extension-block-0.0.1-SNAPSHOT.jar
