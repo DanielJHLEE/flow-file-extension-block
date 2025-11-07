@@ -1,12 +1,9 @@
 spring:
-  application:
-    name: file-extension-block
-
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/flow?createDatabaseIfNotExist=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-    username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:9181}
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MySQL
+    username: sa
+    password:
 
   jpa:
     hibernate:
@@ -15,7 +12,7 @@ spring:
       hibernate:
         format_sql: true
         show_sql: true
-    database-platform: org.hibernate.dialect.MySQLDialect
+    database-platform: org.hibernate.dialect.H2Dialect
   
   sql:
     init:
@@ -33,11 +30,9 @@ logging:
 
 # ==================================================
 # 🔒 보안상 위험한 확장자 목록 (등록 차단용) - 커스텀
-# - 실행 파일, 스크립트, 서버 실행형, 시스템 파일 등
 # ==================================================
 security:
   disallowed-extensions:
-    # 실행 파일 (직접 실행 가능)
     - exe
     - com
     - bat
@@ -47,8 +42,6 @@ security:
     - pif
     - cpl
     - dll
-
-    # 스크립트/코드 실행 파일
     - sh
     - bash
     - js
@@ -59,8 +52,6 @@ security:
     - wsh
     - ps1
     - reg
-
-    # 서버 사이드 코드 (웹 실행 위험)
     - jsp
     - php
     - asp
@@ -69,15 +60,11 @@ security:
     - pl
     - py
     - rb
-
-    # 시스템 및 설정 파일
     - ini
     - inf
     - sys
     - bin
     - dat
-
-    # 압축 / 패키지 파일 (내부에 악성코드 가능)
     - jar
     - class
     - zip
