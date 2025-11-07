@@ -63,7 +63,7 @@ Spring Boot 기반의 파일 확장자 차단 관리 시스템입니다.
 7. cs_add_status=**N**&is_active=**2** 삭제 : **비활성화**    
  
 **📡 API 명세**  
-Method	Endpoint	설명  
+**Method	Endpoint	설명**  
 **GET**	/api/ext-files	전체 확장자 목록 조회  
 **GET**	/api/ext-files/fixed	고정 확장자 목록 조회  
 **GET**	/api/ext-files/custom	커스텀 확장자 목록 조회  
