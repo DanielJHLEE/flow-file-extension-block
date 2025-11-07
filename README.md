@@ -27,58 +27,55 @@ Spring Boot 기반의 파일 확장자 차단 관리 시스템입니다.
 **🧠 상태값 정의(확장자 차단 로직)**
 구분	**px_status** / **cs_add_status**  /**is_active**
 
-1. px_status=**Y**&is_active=**0** 체크됨 :  **대기**	
-2. px_status=**Y**&is_active=**0**	체크됨 :  **대기**
+**(고정 확장자&활성화여부)**
+1. px_status=**Y**&is_active=**0**	체크됨 :  **대기**
+2. px_status=**Y**&is_active=**1** 체크됨 : **활성화(차단활성화)**
+3. px_status=**Y**&is_active=**2**	체크됨 :  **비활성화**
+4. px_status=**N**&is_active=**0**	언체크 :  **대기**
 
-4. px_status=**Y**&is_active=**1** 체크됨 : **활성화(차단활성화)**
-5. cs_add_status=**Y**&is_active=**1** 체크됨 : **활성화(차단활성화)**
-6. cs_add_status=**Y**&is_active=**1** 체크됨 : **활성화(차단활성화)**
+**(커스텀 확장자&활성화여부)**  
+5. cs_add_status=**Y**&is_active=**0** 추가 : **대기**  
+6. cs_add_status=**Y**&is_active=**1** 추가 : **활성화(차단활성화)**  
+7. cs_add_status=**N**&is_active=**2** 삭제 : **비활성화**    
+ 
+**📡 API 명세**  
+Method	Endpoint	설명  
+**GET**	/api/ext-files	전체 확장자 목록 조회  
+**GET**	/api/ext-files/fixed	고정 확장자 목록 조회  
+**GET**	/api/ext-files/custom	커스텀 확장자 목록 조회  
+**PUT**	/api/ext-files/{id}/status	고정 확장자 상태 변경  
+**POST**	/api/ext-files/custom	커스텀 확장자 추가  
+**PATCH**	/api/ext-files/custom/{id}	커스텀 확장자 비활성화  
+**DELETE**	/api/ext-files/custom/{id}	커스텀 확장자 완전 삭제    
 
-7. px_status=**N**&is_active=**0** 언체크 : **대기**
-8. cs_add_status=**N**&is_active=**0** 언체크 : **대기**
-9.  
-활성	Y	1	(실제 차단 적용)
-
-비활성	N	2	비활성화
-
-
-**📡 API 명세**
-Method	Endpoint	설명
-GET	/api/ext-files	전체 확장자 목록 조회
-GET	/api/ext-files/fixed	고정 확장자 목록 조회
-GET	/api/ext-files/custom	커스텀 확장자 목록 조회
-PUT	/api/ext-files/{id}/status	고정 확장자 상태 변경
-POST	/api/ext-files/custom	커스텀 확장자 추가
-PATCH	/api/ext-files/custom/{id}	커스텀 확장자 비활성화
-DELETE	/api/ext-files/custom/{id}	커스텀 확장자 완전 삭제
-
-🧩 빠른 시작 (Bash / macOS / Linux)
-
+**🧩 빠른 시작 (Bash / macOS / Linux)**  
 1️⃣ 프로젝트 루트로 이동
 
-cd ./file-extension-block
+**cd ./file-extension-block**
 
 
-2️⃣ 애플리케이션 실행 (개발용)
+2️⃣ 애플리케이션 실행 (개발용) 
 
-./gradlew bootRun
+**./gradlew bootRun**
 
 
-3️⃣ 또는 빌드 후 실행
+3️⃣ 또는 빌드 후 실행  
+**./gradlew clean build**  
 
-./gradlew clean build
 # 생성된 jar 위치: build/libs/<프로젝트>-<버전>.jar
-java -jar build/libs/file-extension-block-0.0.1-SNAPSHOT.jar
+**java -jar build/libs/file-extension-block-0.0.1-SNAPSHOT.jar**
 
-환경변수(선택)
+**환경변수(선택)**
 - DB 사용자명: DB_USERNAME (기본값: root)
 - DB 비밀번호: DB_PASSWORD (기본값: 9181)
 
-예시: PowerShell에서 일시적으로 설정 후 실행
+**예시**: PowerShell에서 일시적으로 설정 후 실행
 
-```powershell
-$env:DB_USERNAME = 'root'; $env:DB_PASSWORD = '9181'; .\gradlew.bat bootRun
+```**powershell**
+$env:DB_USERNAME = 'root';  
+$env:DB_PASSWORD = '9181';
 ```
+**.\gradlew.bat bootRun**
 
 ## 설정
 - 애플리케이션 설정 파일: `file-extension-block/src/main/resources/application.yaml`
