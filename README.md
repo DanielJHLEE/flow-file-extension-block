@@ -1,6 +1,7 @@
-🧱 **Flow File Extension Block**  
-📄 **파일 확장자 차단 시스템 (File Extension Block System)**
+# Flow-File-Extension-Block
+플로우(마드라스체크) 파일 확장자 차단 과제 지원자: 이재홍
 
+📄 **파일 확장자 차단 시스템 (File-Extension-Block-System)**  
 📘 **프로젝트 개요**
 
 Spring Boot 기반의 파일 확장자 차단 관리 시스템입니다.  
